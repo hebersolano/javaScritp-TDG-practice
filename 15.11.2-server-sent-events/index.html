@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>SSE Chat</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: aliceblue;
+      }
+
+      main {
+        width: 60%;
+        padding: 24px;
+        border: 1px solid black;
+      }
+
+      #input {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div>
+        <input id="input" type="text" placeholder="message" />
+        <button id="sent">sent</button>
+      </div>
+    </main>
+    <script>
+      const nick = prompt("Enter your nickname", "name");
+
+      const input = document.querySelector("#input");
+      const sentBtn = document.querySelector("#sent");
+
+      const chat = new EventSource("/chat");
+      chat.onmessage = (e) => {
+        console.log(e);
+      };
+      chat.addEventListener("chat", (e) => {
+        console.log("event src", e);
+        let div = document.createElement("div");
+        div.append(e.data);
+        input.before(div);
+        input.scrollIntoView();
+      });
+
+      sentBtn.addEventListener("click", (e) => {
+        console.log("on change input", input.value);
+        fetch("/chat", {
+          method: "POST",
+          body: nick + ": " + input.value,
+        })
+          .then((res) => res.text().then((data) => console.log("sent input response", res)))
+          .catch((err) => console.error("sent input error", err));
+
+        input.value = "";
+      });
+    </script>
+  </body>
+</html>
