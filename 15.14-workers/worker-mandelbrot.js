@@ -1,6 +1,6 @@
 self.onmessage = function (message) {
-  const { tile, x0, y0, perPixel, maxIterations } = message;
-  const { width, height } = tile;
+  const { tile, x0, y0, perPixel, maxIterations } = message.data;
+  let { width, height, x, y } = tile;
 
   const imageData = new ImageData(width, height);
   const iterations = new Uint32Array(imageData.data.buffer);
@@ -9,7 +9,7 @@ self.onmessage = function (message) {
     max = 0,
     min = maxIterations;
 
-  for (let row = 0, x = x0; row < height; row++, y += perPixel) {
+  for (let row = 0, y = y0; row < height; row++, y += perPixel) {
     for (let column = 0, x = x0; column < width; column++, x += perPixel) {
       let n;
       let r = x,
